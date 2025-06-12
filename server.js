@@ -3,6 +3,10 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 
+
+// ⬇️ Agrega esta línea
+const initializeDatabase = require('./db/initDB');
+
 // 🔵 Inicializar express
 const app = express();
 
@@ -29,6 +33,14 @@ app.use('/api', authRoutes);
 app.use('/api', salaRoutes);
 app.use('/api', userRoutes);
 
+// 🔵 Inicializar base de datos antes de levantar el servidor
+initializeDatabase().then(() => {
+    // 🔵 Iniciar servidor después de crear tablas
+    server.listen(process.env.PORT, () => {
+        console.log('✅ Servidor corriendo en puerto', process.env.PORT);
+    });
+});
+
 // 🔵 Configuración de Socket.io
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado:', socket.id);
@@ -48,7 +60,11 @@ io.on('connection', (socket) => {
     });
 });
 
+// 🔵 Inicializar base de datos
+//initializeDatabase();
+
+
 // 🔵 Levantar servidor
-server.listen(process.env.PORT, () => {
-    console.log('Servidor corriendo en puerto', process.env.PORT);
-});
+//server.listen(process.env.PORT, () => {
+   // console.log('Servidor corriendo en puerto', process.env.PORT);
+//});
